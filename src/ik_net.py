@@ -6,7 +6,7 @@ from pydrake.all import (
     MultibodyPlant,
     StartMeshcat,
 )
-from src.utils import RepoDir, BuildEnv
+from src.utils import RepoDir, BuildEnv, extract_xyzrpy
 
 
 
@@ -67,6 +67,54 @@ class LinearModule(torch.nn.Module):
     def forward(self, x):
         return self.network(x)
 
+def train_test_split(X, y, test_size=0.2):
+    n_samples = X.shape[0]
+    indices = np.arange(n_samples)
+    np.random.shuffle(indices)
+
+    split_idx = int(n_samples * (1 - test_size))
+    train_indices = indices[:split_idx]
+    test_indices = indices[split_idx:]
+
+    X_train, X_test = X[train_indices], X[test_indices]
+    y_train, y_test = y[train_indices], y[test_indices]
+
+    return X_train, X_test, y_train, y_test
+
+def train_model(model, optimizer, loss_fn, X_train, y_train, epochs=1000):
+    '''batch this'''
+    X_tensor = torch.FloatTensor(X_train)
+    y_tensor = torch.FloatTensor(y_train)
+
+    for epoch in tqdm(range(epochs)):
+        optimizer.zero_grad()
+        predictions = model(X_tensor)
+        loss = loss_fn(predictions, y_tensor)
+        loss.backward()
+        optimizer.step()
+        
+        if epoch % 100 == 0:
+            print(f"Epoch {epoch}, Loss: {loss.item():.6f}")
+
+def evaluate_model(model, loss_fn, X_test, y_test, dataset):
+    X_tensor = torch.FloatTensor(X_test)
+    y_tensor = torch.FloatTensor(y_test)
+
+    with torch.no_grad():
+        predictions = model(X_tensor)
+        loss = loss_fn(predictions, y_tensor)
+    
+    print(predictions.shape)
+    backwards_loss = np.zeros(predictions.shape[0])
+    for i, angles in enumerate(predictions):
+        dataset.plant.SetPositions(dataset.plant_context, angles)
+        pose = dataset.ee_frame.CalcPoseInWorld(dataset.plant_context)
+        backwards_loss[i] = np.linalg.norm(extract_xyzrpy(pose) - X_tensor.numpy()[i][:6])
+    
+
+
+    print(f"Backwards Loss: {np.mean(backwards_loss):.6f}")
+    print(f"Test Loss: {loss.item():.6f}")
 
 if __name__ == "__main__":
     meshcat = StartMeshcat()
@@ -75,6 +123,18 @@ if __name__ == "__main__":
 
     dataset = IKDataset(diagram, ee_frame)
 
-    joint_angles, targets = dataset.create_data(7**7, manifold = [1, 1, 1])
+    joint_angles, targets = dataset.create_data(5**7, manifold = [1, 1, 1])
 
-    print(joint_angles[:10])
+    X = np.concatenate([targets, joint_angles[:, 0:1]], axis=1)
+    y = joint_angles
+    
+    model = LinearModule(7, 7, hidden_layers = [256, 256, 256])
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+    loss_fn = torch.nn.MSELoss()
+
+    X_tensor = torch.FloatTensor(X)
+    y_tensor = torch.FloatTensor(y)
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    train_model(model, optimizer, loss_fn, X_train, y_train, epochs=200)
+    evaluate_model(model, loss_fn, X_test, y_test, dataset)
