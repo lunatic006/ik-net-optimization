@@ -1,0 +1,332 @@
+{
+    "asset": {
+        "version": "2.0",
+        "generator": "Open Asset Import Library (assimp v5.2.0)"
+    },
+    "extensionsUsed": [
+        "KHR_materials_pbrSpecularGlossiness",
+        "FB_ngon_encoding"
+    ],
+    "accessors": [
+        {
+            "bufferView": 0,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 9736,
+            "type": "VEC3",
+            "max": [
+                0.11715669929981232,
+                0.049499981105327609,
+                0.11715669929981232
+            ],
+            "min": [
+                -0.11715669929981232,
+                -0.049499981105327609,
+                -0.11715669929981232
+            ]
+        },
+        {
+            "bufferView": 1,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 9736,
+            "type": "VEC3",
+            "max": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "min": [
+                -1.0,
+                -1.0,
+                -1.0
+            ]
+        },
+        {
+            "bufferView": 2,
+            "byteOffset": 0,
+            "componentType": 5125,
+            "count": 18792,
+            "type": "SCALAR",
+            "max": [
+                9735
+            ],
+            "min": [
+                0
+            ]
+        },
+        {
+            "bufferView": 3,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 13419,
+            "type": "VEC3",
+            "max": [
+                0.1269983947277069,
+                0.043816499412059787,
+                0.1269983947277069
+            ],
+            "min": [
+                -0.1269983947277069,
+                -0.043816499412059787,
+                -0.1269983947277069
+            ]
+        },
+        {
+            "bufferView": 4,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 13419,
+            "type": "VEC3",
+            "max": [
+                0.9949806928634644,
+                0.8237236142158508,
+                0.9949806928634644
+            ],
+            "min": [
+                -0.9949806928634644,
+                -0.8151190280914307,
+                -0.9949806928634644
+            ]
+        },
+        {
+            "bufferView": 5,
+            "byteOffset": 0,
+            "componentType": 5125,
+            "count": 21024,
+            "type": "SCALAR",
+            "max": [
+                13418
+            ],
+            "min": [
+                0
+            ]
+        }
+    ],
+    "buffers": [
+        {
+            "byteLength": 714984,
+            "uri": "omni_wheel_1.bin"
+        }
+    ],
+    "bufferViews": [
+        {
+            "buffer": 0,
+            "byteOffset": 0,
+            "byteLength": 116832,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 116832,
+            "byteLength": 116832,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 233664,
+            "byteLength": 75168,
+            "target": 34963
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 308832,
+            "byteLength": 161028,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 469860,
+            "byteLength": 161028,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 630888,
+            "byteLength": 84096,
+            "target": 34963
+        }
+    ],
+    "materials": [
+        {
+            "name": "Material_001",
+            "pbrMetallicRoughness": {
+                "baseColorFactor": [
+                    0.0813199132680893,
+                    0.0813199132680893,
+                    0.0813199132680893,
+                    1.0
+                ],
+                "metallicFactor": 0.0,
+                "roughnessFactor": 0.9925575256347656
+            },
+            "extensions": {
+                "KHR_materials_pbrSpecularGlossiness": {
+                    "diffuseFactor": [
+                        0.0813199132680893,
+                        0.0813199132680893,
+                        0.0813199132680893,
+                        1.0
+                    ],
+                    "specularFactor": [
+                        0.02631302922964096,
+                        0.02631302922964096,
+                        0.02631302922964096
+                    ],
+                    "glossinessFactor": 0.07999999821186066
+                }
+            }
+        },
+        {
+            "name": "Material_002",
+            "pbrMetallicRoughness": {
+                "baseColorFactor": [
+                    0.38134709000587466,
+                    0.38134709000587466,
+                    0.38134709000587466,
+                    1.0
+                ],
+                "metallicFactor": 0.0,
+                "roughnessFactor": 0.9435950517654419
+            },
+            "emissiveFactor": [
+                0.20199990272521974,
+                0.20199990272521974,
+                0.20199990272521974
+            ],
+            "extensions": {
+                "KHR_materials_pbrSpecularGlossiness": {
+                    "diffuseFactor": [
+                        0.38134709000587466,
+                        0.38134709000587466,
+                        0.38134709000587466,
+                        1.0
+                    ],
+                    "specularFactor": [
+                        0.15827609598636628,
+                        0.15827609598636628,
+                        0.15827609598636628
+                    ],
+                    "glossinessFactor": 0.12700000405311585
+                }
+            }
+        }
+    ],
+    "meshes": [
+        {
+            "name": "mecawheelA__llantas__1_-mesh",
+            "primitives": [
+                {
+                    "mode": 4,
+                    "material": 1,
+                    "indices": 2,
+                    "attributes": {
+                        "POSITION": 0,
+                        "NORMAL": 1
+                    }
+                }
+            ]
+        },
+        {
+            "name": "mecawheelA__rollers_-mesh",
+            "primitives": [
+                {
+                    "mode": 4,
+                    "material": 0,
+                    "indices": 5,
+                    "attributes": {
+                        "POSITION": 3,
+                        "NORMAL": 4
+                    }
+                }
+            ]
+        }
+    ],
+    "nodes": [
+        {
+            "name": "Scene",
+            "matrix": [
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                -1.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "children": [
+                1,
+                2,
+                3,
+                4
+            ]
+        },
+        {
+            "name": "Camera",
+            "matrix": [
+                0.6858804821968079,
+                0.7276337742805481,
+                -0.010816779918968678,
+                0.0,
+                -0.31737008690834048,
+                0.31246858835220339,
+                0.8953431844711304,
+                0.0,
+                0.6548619270324707,
+                -0.6106656193733215,
+                0.4452453851699829,
+                0.0,
+                7.4811320304870609,
+                -6.5076398849487309,
+                5.34366512298584,
+                1.0
+            ]
+        },
+        {
+            "name": "Lamp",
+            "matrix": [
+                -0.29086458683013918,
+                0.9551712274551392,
+                -0.05518905818462372,
+                0.0,
+                -0.7711008191108704,
+                -0.19988340139389039,
+                0.6045246720314026,
+                0.0,
+                0.5663931965827942,
+                0.21839119493961335,
+                0.7946723103523254,
+                0.0,
+                3.554044008255005,
+                1.3429299592971802,
+                6.152204990386963,
+                1.0
+            ]
+        },
+        {
+            "name": "mecawheelA__llantas__1_",
+            "mesh": 0
+        },
+        {
+            "name": "mecawheelA__rollers_",
+            "mesh": 1
+        }
+    ],
+    "scenes": [
+        {
+            "nodes": [
+                0
+            ]
+        }
+    ],
+    "scene": 0
+}

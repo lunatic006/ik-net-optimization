@@ -1,0 +1,132 @@
+# Model directives for a kmr base with an iiwa14 mounted on it (with sphere collision geometries).
+
+directives:
+
+- add_model:
+    name: kmr_base
+    file: package://combining_kinematics/models/kmriiwa/urdf/kmriiwa.urdf
+    default_joint_positions:
+        x: [1.5]
+        y: [0]
+        theta: [0]
+
+
+
+- add_model:
+    name: arm
+    file: package://drake_models/iiwa_description/urdf/iiwa14_spheres_collision.urdf
+    default_joint_positions:
+        iiwa_joint_1: [-1.57]
+        iiwa_joint_2: [0.6]
+        iiwa_joint_3: [0]
+        iiwa_joint_4: [-1.6]
+        iiwa_joint_5: [0]
+        iiwa_joint_6: [0.94]
+        iiwa_joint_7: [0]
+
+- add_weld:
+    parent: kmr_base::kmriiwa_mount_frame
+    child: arm::base
+
+- add_model:
+    name: gripper
+    file: package://drake_models/wsg_50_description/sdf/schunk_wsg_50_welded_fingers.sdf
+
+- add_frame:
+    name: arm::wsg_attach
+    X_PF:
+      base_frame: arm::iiwa_link_7
+      translation: [0, 0, 0.084]
+      rotation: !Rpy { deg: [90.0, 0.0, 90.0 ]}
+
+- add_weld:
+    parent: arm::wsg_attach
+    child: gripper::body
+
+# Add shelves
+- add_model:
+    name: shelves_1
+    file: package://combining_kinematics/models/pr2/shelves/shelves.sdf
+
+- add_frame:
+    name: shelf_1_origin
+    X_PF:
+      base_frame: world
+      translation: [0.85, 0, 1.396706]
+      rotation: !Rpy { deg: [0, 0, -180] }
+
+- add_weld:
+    parent: shelf_1_origin
+    child: shelves_1::shelves_body
+
+- add_model:
+    name: shelves_2
+    file: package://combining_kinematics/models/pr2/shelves/shelves.sdf
+
+- add_frame:
+    name: shelf_2_origin
+    X_PF:
+      base_frame: world
+      translation: [0, 0.85, 1.396706]
+      rotation: !Rpy { deg: [0, 0, -90] }
+
+- add_weld:
+    parent: shelf_2_origin
+    child: shelves_2::shelves_body
+
+- add_model:
+    name: shelves_3
+    file: package://combining_kinematics/models/pr2/shelves/shelves.sdf
+
+- add_frame:
+    name: shelf_3_origin
+    X_PF:
+      base_frame: world
+      translation: [-0.85, 0, 1.396706]
+      rotation: !Rpy { deg: [0, 0, 0] }
+
+- add_weld:
+    parent: shelf_3_origin
+    child: shelves_3::shelves_body
+
+- add_model:
+    name: shelves_4
+    file: package://combining_kinematics/models/pr2/shelves/shelves.sdf
+
+- add_frame:
+    name: shelf_4_origin
+    X_PF:
+      base_frame: world
+      translation: [0, -0.85, 1.396706]
+      rotation: !Rpy { deg: [0, 0, 90] }
+
+- add_weld:
+    parent: shelf_4_origin
+    child: shelves_4::shelves_body
+
+# Add table
+- add_model:
+    name: table
+    file: package://combining_kinematics/models/pr2/table/table_extra_wide_better_collision.sdf
+
+- add_frame:
+    name: table_origin
+    X_PF:
+      base_frame: world
+      translation: [0, 0, 0.996706]
+
+- add_weld:
+    parent: table_origin
+    child: table::table_body
+
+- add_model:
+      name: mug3
+      # file: package://drake/examples/manipulation_station/models/shelves.sdf
+      file: package://combining_kinematics/models/mug/mug_simple_red.urdf
+
+- add_weld:
+      parent: world
+      child: mug3::mug_body_link
+      X_PC:
+        translation: [0, -0.85, 1.06]
+        rotation: !Rpy { deg: [0.0, 0.0, -90.0] }

@@ -1,0 +1,29 @@
+# Model directive for a hubo humanoid in a world where we can do stability IK problems
+
+directives:
+
+# Add hubo
+- add_model:
+    name: hubo
+    file: package://combining_kinematics/models/hubo/hubo.urdf
+    default_joint_positions:
+      LSR: [0.2]
+      RSR: [-0.2]
+      leftThumbKnuckle1: [1.5]
+      rightThumbKnuckle1: [1.5]
+
+# Add table
+- add_model:
+    name: table
+    file: package://drake_models/manipulation_station/table_wide.sdf
+
+- add_frame:
+    name: table_origin
+    X_PF:
+      base_frame: world
+      translation: [0.4, 0.0, 0.6]
+      rotation: !Rpy { deg: [0., 0., 00]}
+
+- add_weld:
+    parent: table_origin
+    child: table::table_body

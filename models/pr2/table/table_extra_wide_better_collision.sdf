@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<sdf version="1.7">
+  <model name="table">
+    <link name="table_body">
+      <visual name="table_visual">
+        <geometry>
+          <mesh>
+            <uri>table_extra_wide.obj</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="table_top">
+        <pose> 0 0 -0.03 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>2.1 2.2 0.06</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="table_top_2">
+        <pose> 0 0 -0.08 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>2.0 2.0 0.04</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="leg_1">
+        <pose> 0.855 0.8625 -0.55 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.09 0.125 0.9</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="leg_2">
+        <pose> -0.855 0.8625 -0.55 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.09 0.125 0.9</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="leg_3">
+        <pose> -0.855 -0.857 -0.55 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.09 0.125 0.9</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="leg_4">
+        <pose> 0.855 -0.857 -0.55 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.09 0.125 0.9</size>
+          </box>
+        </geometry>
+      </collision>
+    </link>
+  </model>
+</sdf>

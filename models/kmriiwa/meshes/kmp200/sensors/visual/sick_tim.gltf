@@ -1,0 +1,273 @@
+{
+    "asset": {
+        "version": "2.0",
+        "generator": "Open Asset Import Library (assimp v5.2.0)"
+    },
+    "extensionsUsed": [
+        "KHR_materials_pbrSpecularGlossiness",
+        "FB_ngon_encoding"
+    ],
+    "accessors": [
+        {
+            "bufferView": 0,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 28621,
+            "type": "VEC3",
+            "max": [
+                0.028997300192713739,
+                0.038101911544799808,
+                0.02518438920378685
+            ],
+            "min": [
+                -0.04729139059782028,
+                -0.038101911544799808,
+                -0.06064629182219505
+            ]
+        },
+        {
+            "bufferView": 1,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 28621,
+            "type": "VEC3",
+            "max": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "min": [
+                -1.0,
+                -1.0,
+                -1.0
+            ]
+        },
+        {
+            "bufferView": 2,
+            "byteOffset": 0,
+            "componentType": 5125,
+            "count": 37470,
+            "type": "SCALAR",
+            "max": [
+                28620
+            ],
+            "min": [
+                0
+            ]
+        },
+        {
+            "bufferView": 3,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 12658,
+            "type": "VEC3",
+            "max": [
+                0.02899998053908348,
+                0.02999996952712536,
+                -0.015776749700307847
+            ],
+            "min": [
+                -0.03199993818998337,
+                -0.0306999608874321,
+                -0.06061737984418869
+            ]
+        },
+        {
+            "bufferView": 4,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 12658,
+            "type": "VEC3",
+            "max": [
+                0.9999837279319763,
+                1.0,
+                1.0
+            ],
+            "min": [
+                -1.0,
+                -1.0,
+                -1.0
+            ]
+        },
+        {
+            "bufferView": 5,
+            "byteOffset": 0,
+            "componentType": 5125,
+            "count": 14400,
+            "type": "SCALAR",
+            "max": [
+                12657
+            ],
+            "min": [
+                0
+            ]
+        }
+    ],
+    "buffers": [
+        {
+            "byteLength": 1198176,
+            "uri": "sick_tim_0.bin"
+        }
+    ],
+    "bufferViews": [
+        {
+            "buffer": 0,
+            "byteOffset": 0,
+            "byteLength": 343452,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 343452,
+            "byteLength": 343452,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 686904,
+            "byteLength": 149880,
+            "target": 34963
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 836784,
+            "byteLength": 151896,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 988680,
+            "byteLength": 151896,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 1140576,
+            "byteLength": 57600,
+            "target": 34963
+        }
+    ],
+    "materials": [
+        {
+            "name": "Material",
+            "pbrMetallicRoughness": {
+                "baseColorFactor": [
+                    0.015078850090503693,
+                    0.014587289653718472,
+                    0.014955069869756699,
+                    1.0
+                ],
+                "metallicFactor": 0.0,
+                "roughnessFactor": 0.888196587562561
+            },
+            "extensions": {
+                "KHR_materials_pbrSpecularGlossiness": {
+                    "diffuseFactor": [
+                        0.015078850090503693,
+                        0.014587289653718472,
+                        0.014955069869756699,
+                        1.0
+                    ],
+                    "specularFactor": [
+                        0.5,
+                        0.5,
+                        0.5
+                    ],
+                    "glossinessFactor": 0.05000000074505806
+                }
+            }
+        },
+        {
+            "name": "Material_001",
+            "pbrMetallicRoughness": {
+                "baseColorFactor": [
+                    0.6399999856948853,
+                    0.4608162045478821,
+                    0.2655293941497803,
+                    1.0
+                ],
+                "metallicFactor": 0.0,
+                "roughnessFactor": 0.888196587562561
+            },
+            "extensions": {
+                "KHR_materials_pbrSpecularGlossiness": {
+                    "diffuseFactor": [
+                        0.6399999856948853,
+                        0.4608162045478821,
+                        0.2655293941497803,
+                        1.0
+                    ],
+                    "specularFactor": [
+                        0.5,
+                        0.5,
+                        0.5
+                    ],
+                    "glossinessFactor": 0.05000000074505806
+                }
+            }
+        }
+    ],
+    "meshes": [
+        {
+            "name": "sick_tim-mesh",
+            "primitives": [
+                {
+                    "mode": 4,
+                    "material": 0,
+                    "indices": 2,
+                    "attributes": {
+                        "POSITION": 0,
+                        "NORMAL": 1
+                    }
+                },
+                {
+                    "mode": 4,
+                    "material": 1,
+                    "indices": 5,
+                    "attributes": {
+                        "POSITION": 3,
+                        "NORMAL": 4
+                    }
+                }
+            ]
+        }
+    ],
+    "nodes": [
+        {
+            "name": "Scene",
+            "matrix": [
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                -1.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "children": [
+                1
+            ]
+        },
+        {
+            "name": "sick_tim",
+            "mesh": 0
+        }
+    ],
+    "scenes": [
+        {
+            "nodes": [
+                0
+            ]
+        }
+    ],
+    "scene": 0
+}

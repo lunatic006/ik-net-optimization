@@ -1,0 +1,11 @@
+# Model directive for a hubo humanoid in a world where we can do stability IK problems
+
+directives:
+
+# Add hubo
+- add_model:
+    name: nao
+    file: package://combining_kinematics/models/nao/nao.urdf
+    # default_joint_positions:
+    #   LFinger21: [1.0]
+    #   RFinger21: [1.0]
