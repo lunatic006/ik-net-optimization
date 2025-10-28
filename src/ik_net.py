@@ -179,6 +179,49 @@ def normalize_data(X, y):
 def denormalize_output(y_norm, y_mean, y_std):
     return y_norm * y_std + y_mean
 
+def save_model(model, model_path, X_mean=None, X_std=None, y_mean=None, y_std=None):
+    """Save model and optional normalization parameters"""
+    save_dict = {
+        'model_state_dict': model.state_dict(),
+        'model_architecture': {
+            'input_size': model.network[0].in_features,
+            'output_size': model.network[-1].out_features,
+            'hidden_layers': [layer.out_features for layer in model.network if isinstance(layer, torch.nn.Linear)][:-1]
+        }
+    }
+    
+    # Save normalization parameters if provided
+    if X_mean is not None:
+        save_dict['X_mean'] = X_mean
+        save_dict['X_std'] = X_std
+        save_dict['y_mean'] = y_mean
+        save_dict['y_std'] = y_std
+    
+    torch.save(save_dict, model_path)
+    print(f"Model saved to {model_path}")
+
+def load_model(model_path, device='cpu'):
+    """Load model and normalization parameters"""
+    checkpoint = torch.load(model_path, map_location=device)
+    
+    # Recreate model architecture
+    arch = checkpoint['model_architecture']
+    model = LinearModule(arch['input_size'], arch['output_size'], arch['hidden_layers'])
+    model.load_state_dict(checkpoint['model_state_dict'])
+    model.to(device)
+    
+    # Load normalization parameters if they exist
+    norm_params = None
+    if 'X_mean' in checkpoint:
+        norm_params = {
+            'X_mean': checkpoint['X_mean'],
+            'X_std': checkpoint['X_std'],
+            'y_mean': checkpoint['y_mean'],
+            'y_std': checkpoint['y_std']
+        }
+    
+    return model, norm_params
+
 
 if __name__ == "__main__":
     # Check for CUDA availability
@@ -206,3 +249,7 @@ if __name__ == "__main__":
 
     losses = train_model(model, optimizer, loss_fn, X_train, y_train, epochs=1000, batch_size=2048, device=device)
     evaluate_model(model, loss_fn, X_test, y_test, dataset, matrix=True, device=device)
+
+    model_save_path = os.path.join(RepoDir(), "models", "ik_net_model.pth")
+    os.makedirs(os.path.dirname(model_save_path), exist_ok=True)
+    save_model(model, model_save_path)
