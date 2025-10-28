@@ -64,10 +64,18 @@ class LinearModule(torch.nn.Module):
         layers = []
         in_size = input_size
         for h in hidden_layers:
-            layers.append(torch.nn.Linear(in_size, h))
-            layers.append(torch.nn.Sigmoid())
+            # Create layer
+            linear = torch.nn.Linear(in_size, h)
+            # Apply Kaiming init
+            
+            torch.nn.init.kaiming_normal_(linear.weight, nonlinearity='relu')
+            torch.nn.init.zeros_(linear.bias)
+
+            layers.append(linear)
+            layers.append(torch.nn.ReLU())
             if dropout_rate > 0:
                 layers.append(torch.nn.Dropout(dropout_rate))
+
             in_size = h
         layers.append(torch.nn.Linear(in_size, output_size))
         self.network = torch.nn.Sequential(*layers)
@@ -178,18 +186,17 @@ if __name__ == "__main__":
 
     dataset = IKDataset(diagram, ee_frame)
 
-    joint_angles, targets = dataset.create_data(5**7, manifold = [-1, 1, 1])
+    joint_angles, targets = dataset.create_data(7**7, manifold = [1, 1, 1], matrix=True)
 
     X = np.concatenate([targets, joint_angles[:, 0:1]], axis=1)
     y = joint_angles
-    
-    model = LinearModule(X.shape[1], 7, hidden_layers = [128, 128, 128])
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
+
+    model = LinearModule(X.shape[1], 7, hidden_layers = [64, 64], dropout_rate=0.0)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-2)
     loss_fn = torch.nn.MSELoss()
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-    print(X_test.shape)
-    print(X_train.shape)
 
-    train_model(model, optimizer, loss_fn, X_train, y_train, epochs=1000)
-    evaluate_model(model, loss_fn, X_test, y_test, dataset)
+
+    losses = train_model(model, optimizer, loss_fn, X_train, y_train, epochs=1000, batch_size=2048)
+    evaluate_model(model, loss_fn, X_test, y_test, dataset, matrix=True)
