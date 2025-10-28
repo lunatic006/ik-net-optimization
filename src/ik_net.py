@@ -191,12 +191,12 @@ if __name__ == "__main__":
 
     dataset = IKDataset(diagram, ee_frame)
 
-    joint_angles, targets = dataset.create_data(7**7, manifold = [1, 1, 1], matrix=True)
+    joint_angles, targets = dataset.create_data(5**7, manifold = [1, 1, 1], matrix=True)
 
     X = np.concatenate([targets, joint_angles[:, 0:1]], axis=1)
     y = joint_angles
 
-    model = LinearModule(X.shape[1], 7, hidden_layers = [64, 64], dropout_rate=0.0)
+    model = LinearModule(X.shape[1], 7, hidden_layers = [64, 64, 64], dropout_rate=0.0)
     model.to(device)  # Move model to GPU
     
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-2)
