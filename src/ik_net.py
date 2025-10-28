@@ -234,7 +234,7 @@ if __name__ == "__main__":
 
     dataset = IKDataset(diagram, ee_frame)
 
-    joint_angles, targets = dataset.create_data(5**7, manifold = [1, 1, 1], matrix=True)
+    joint_angles, targets = dataset.create_data(6**7, manifold = [1, 1, 1], matrix=True)
 
     X = np.concatenate([targets, joint_angles[:, 0:1]], axis=1)
     y = joint_angles
