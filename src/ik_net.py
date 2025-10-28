@@ -97,10 +97,10 @@ def train_test_split(X, y, test_size=0.2):
 
     return X_train, X_test, y_train, y_test
 
-def train_model(model, optimizer, loss_fn, X_train, y_train, epochs=1000, batch_size=None):
+def train_model(model, optimizer, loss_fn, X_train, y_train, epochs=1000, batch_size=None, device='cpu'):
     '''Train model with optional batching'''
-    X_tensor = torch.FloatTensor(X_train)
-    y_tensor = torch.FloatTensor(y_train)
+    X_tensor = torch.FloatTensor(X_train).to(device)
+    y_tensor = torch.FloatTensor(y_train).to(device)
     
     losses = []
     
@@ -123,6 +123,7 @@ def train_model(model, optimizer, loss_fn, X_train, y_train, epochs=1000, batch_
         for epoch in tqdm(range(epochs)):
             epoch_loss = 0
             for batch_X, batch_y in dataloader:
+                batch_X, batch_y = batch_X.to(device), batch_y.to(device)
                 optimizer.zero_grad()
                 predictions = model(batch_X)
                 loss = loss_fn(predictions, batch_y)
@@ -137,28 +138,28 @@ def train_model(model, optimizer, loss_fn, X_train, y_train, epochs=1000, batch_
     
     return losses
 
-def evaluate_model(model, loss_fn, X_test, y_test, dataset, matrix = False):
-    X_tensor = torch.FloatTensor(X_test)
-    y_tensor = torch.FloatTensor(y_test)
+def evaluate_model(model, loss_fn, X_test, y_test, dataset, matrix = False, device='cpu'):
+    X_tensor = torch.FloatTensor(X_test).to(device)
+    y_tensor = torch.FloatTensor(y_test).to(device)
 
     with torch.no_grad():
         predictions = model(X_tensor)
         loss = loss_fn(predictions, y_tensor)
     
+    # Move predictions back to CPU for numpy operations
+    predictions_cpu = predictions.cpu()
+    X_tensor_cpu = X_tensor.cpu()
+    
     backwards_loss = np.zeros(predictions.shape[0])
     position_loss = np.zeros(predictions.shape[0])
-    for i, angles in enumerate(predictions):
-        dataset.plant.SetPositions(dataset.plant_context, angles)
+    for i, angles in enumerate(predictions_cpu):
+        dataset.plant.SetPositions(dataset.plant_context, angles.numpy())
         pose = dataset.ee_frame.CalcPoseInWorld(dataset.plant_context)
         if matrix: pose_flatten = pose.translation().tolist() + pose.rotation().matrix().flatten().tolist()
         else: pose_flatten = extract_xyzrpy(pose)
 
-        # if i % 100 == 0:
-        #     print(f"End Effector Pose: {pose_flatten}")
-        #     print(f"Target Pose: {X_tensor.numpy()[i][:-1]}")
-        #     print(np.linalg.norm(pose_flatten - X_tensor.numpy()[i][:-1]))
-        position_loss[i] = np.linalg.norm(pose.translation() - X_tensor.numpy()[i][:3])
-        backwards_loss[i] = np.linalg.norm(pose_flatten - X_tensor.numpy()[i][:-1])
+        position_loss[i] = np.linalg.norm(pose.translation() - X_tensor_cpu.numpy()[i][:3])
+        backwards_loss[i] = np.linalg.norm(pose_flatten - X_tensor_cpu.numpy()[i][:-1])
 
     print(f"Backwards Loss: {np.mean(backwards_loss):.6f}")
     print(f"Position Loss: {np.mean(position_loss):.6f}")
@@ -180,6 +181,10 @@ def denormalize_output(y_norm, y_mean, y_std):
 
 
 if __name__ == "__main__":
+    # Check for CUDA availability
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    print(f"Using device: {device}")
+    
     meshcat = StartMeshcat()
     diagram = BuildEnv(meshcat, directives_file = os.path.join(RepoDir(), "models/iiwa_collision.yaml"))
     ee_frame = diagram.GetSubsystemByName("plant").GetFrameByName("body")
@@ -192,11 +197,12 @@ if __name__ == "__main__":
     y = joint_angles
 
     model = LinearModule(X.shape[1], 7, hidden_layers = [64, 64], dropout_rate=0.0)
+    model.to(device)  # Move model to GPU
+    
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-2)
     loss_fn = torch.nn.MSELoss()
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
-
-    losses = train_model(model, optimizer, loss_fn, X_train, y_train, epochs=1000, batch_size=2048)
-    evaluate_model(model, loss_fn, X_test, y_test, dataset, matrix=True)
+    losses = train_model(model, optimizer, loss_fn, X_train, y_train, epochs=1000, batch_size=2048, device=device)
+    evaluate_model(model, loss_fn, X_test, y_test, dataset, matrix=True, device=device)
