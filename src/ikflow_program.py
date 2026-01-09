@@ -131,21 +131,21 @@ class PandaIKProgram:
         orientation_error = 2 * np.arccos(np.abs(np.dot(orientation, self.target_pose[3:])))
         return np.array([orientation_error])
     
-    def IKConstraint(self):
+    def IKConstraint(self): ## extremely nonlinear equality constraint !!!
         self.position_constraint = self.prog.AddConstraint(
             self.EvalPositionError, 
-            lb=np.zeros(3),
-            ub=np.zeros(3),
+            lb=np.zeros(3) - 1e-3, 
+            ub=np.zeros(3) + 1e-3,
             vars=self.lumped_vars
         )
         self.position_constraint.evaluator().set_description("PositionConstraint")
-        # self.orientation_constraint = self.prog.AddConstraint(
-        #     self.EvalOrientationError,
-        #     lb=np.array([0]),
-        #     ub=np.array([0.3]), # allow small orientation error
-        #     vars=self.lumped_vars
-        # )
-        # self.orientation_constraint.evaluator().set_description("OrientationConstraint")
+        self.orientation_constraint = self.prog.AddConstraint(
+            self.EvalOrientationError,
+            lb=np.array([0]),
+            ub=np.array([0.3]), # allow large orientation error
+            vars=self.lumped_vars
+        )
+        self.orientation_constraint.evaluator().set_description("OrientationConstraint")
     
     def EvalCost(self, vars):
         position, orientation = self.fk(self.VarsToQ(vars))
@@ -199,7 +199,7 @@ class PandaIKProgram:
         solver_options = SolverOptions()
         solver_options.SetOption(IpoptSolver().solver_id(), "acceptable_tol", 1e-4)
         solver_options.SetOption(IpoptSolver().solver_id(), "acceptable_dual_inf_tol", 1e-4)
-        solver_options.SetOption(IpoptSolver().solver_id(), "acceptable_compl_inf_tol", 1e-2)
+        solver_options.SetOption(IpoptSolver().solver_id(), "acceptable_compl_inf_tol", 1e-4)
         solver_options.SetOption(IpoptSolver().solver_id(), "acceptable_constr_viol_tol", 1e-6)
         solver_options.SetOption(IpoptSolver().solver_id(), "file_print_level", 5)
         solver_options.SetOption(IpoptSolver().solver_id(), "print_user_options", "yes")
