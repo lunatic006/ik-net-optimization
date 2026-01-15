@@ -134,15 +134,15 @@ class PandaIKProgram:
     def IKConstraint(self): ## extremely nonlinear equality constraint !!!
         self.position_constraint = self.prog.AddConstraint(
             self.EvalPositionError, 
-            lb=np.zeros(3) - 1e-3, 
-            ub=np.zeros(3) + 1e-3,
+            lb=np.zeros(3) - 1e-2, 
+            ub=np.zeros(3) + 1e-2,
             vars=self.lumped_vars
         )
         self.position_constraint.evaluator().set_description("PositionConstraint")
         self.orientation_constraint = self.prog.AddConstraint(
             self.EvalOrientationError,
             lb=np.array([0]),
-            ub=np.array([0.3]), # allow large orientation error
+            ub=np.array([0.1]), # allow large orientation error
             vars=self.lumped_vars
         )
         self.orientation_constraint.evaluator().set_description("OrientationConstraint")
