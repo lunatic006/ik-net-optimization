@@ -287,4 +287,9 @@
     <limit effort="20" lower="0.0" upper="0.04" velocity="0.2" />
     <mimic joint="panda_finger_joint1" />
   </joint>
+  <drake:collision_filter_group name="fingers">
+    <drake:member link = "panda_leftfinger"/>
+    <drake:member link = "panda_rightfinger"/>
+    <drake:ignored_collision_filter_group name="fingers"/>
+  </drake:collision_filter_group>
 </robot>
