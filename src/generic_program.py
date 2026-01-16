@@ -22,7 +22,7 @@ from pydrake.all import (
 
 @dataclass
 class ProgramOptions:
-    joint_centering_cost: float = field(default=1.0, metadata={"help": "Weight for joint centering cost"})
+    joint_centering_cost: float = field(default=0.0, metadata={"help": "Weight for joint centering cost"})
     collision_avoidance: bool = field(default=True, metadata={"help": "Add collision avoidance constraints"})
     joint_limits: bool = field(default=True, metadata={"help": "Enforce joint limits"})
     ik_constraint_tol: tuple = field(default=(1e-4, 0.01), metadata={"help": "Tolerance for IK constraints: tuple of (position tol, orientation tol)"})

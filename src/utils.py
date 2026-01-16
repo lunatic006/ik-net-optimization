@@ -209,3 +209,9 @@ def extract_xyzrpy(pose):
     result[:3] = pose[:3, 3]
     result[3:] = RollPitchYaw_[type_used](pose[:3, :3]).vector()
     return result
+
+
+class Mug:
+    def __init__(self, middle: RigidTransform = RigidTransform(), height: float = 0.3):
+        self.middle = middle
+        self.height = height

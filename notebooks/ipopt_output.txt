@@ -147,39 +147,25 @@ iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
  104  2.1187552e+00 1.08e-02 6.44e+00  -1.0 6.47e-02    -  1.00e+00 1.00e+00h  1
  105  1.8434808e+00 9.87e-02 4.28e+01  -1.7 3.03e-01    -  1.00e+00 1.00e+00h  1
  106  1.9717842e+00 7.69e-02 1.44e+02  -1.7 1.32e+00    -  1.00e+00 2.20e-01h  3
- 107  1.7943832e+00 6.75e-02 1.14e+02  -1.7 6.47e-01    -  1.00e+00 6.90e-01h  1
- 108  1.6691893e+00 8.91e-02 2.89e+04  -2.6 8.58e-01    -  2.94e-01 3.12e-01h  2
- 109  1.4660295e+00 7.70e-02 1.02e+04  -1.9 8.95e-01    -  1.00e+00 9.29e-01h  1
-iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
- 110  1.5645082e+00 4.33e-02 8.89e+04  -2.1 4.29e-01    -  1.00e+00 7.22e-01h  1
- 111  1.5891345e+00 1.40e-02 3.02e+05  -3.1 1.56e-01    -  6.23e-01 1.00e+00h  1
- 112  1.5837234e+00 9.80e-03 9.41e+03  -3.2 6.56e-02    -  1.00e+00 5.00e-01h  2
- 113  1.5819914e+00 7.97e-03 9.86e+03  -3.2 4.97e-02    -  1.00e+00 5.00e-01h  2
- 114  1.5946909e+00 7.91e-03 6.45e+04  -2.7 1.52e-01    -  1.00e+00 5.00e-01h  2
- 115  1.5645519e+00 5.87e-03 1.01e+05  -2.5 9.72e-02    -  1.00e+00 5.22e-01h  1
- 116  1.5718130e+00 1.07e-02 5.46e+00  -3.0 4.06e-02    -  1.00e+00 1.00e+00h  1
- 117  1.6061328e+00 1.01e-02 8.78e+03  -2.7 1.08e-01    -  9.30e-01 1.00e+00H  1
- 118  1.5741582e+00 1.50e-02 2.07e+00  -2.8 4.06e-02    -  1.00e+00 1.00e+00h  1
- 119  1.5763490e+00 1.35e-02 1.12e+05  -2.5 3.81e-02    -  1.00e+00 1.25e-01h  4
 
-Number of Iterations....: 119
+Number of Iterations....: 106
 
                                    (scaled)                 (unscaled)
-Objective...............:   1.5763490331167884e+00    1.5763490331167884e+00
-Dual infeasibility......:   1.1213380396548324e+05    1.1213380396548324e+05
-Constraint violation....:   1.3506421968878069e-02    1.3506421968878069e-02
+Objective...............:   1.9717842249925241e+00    1.9717842249925241e+00
+Dual infeasibility......:   1.4355868310872398e+02    1.4355868310872398e+02
+Constraint violation....:   7.6876779729584802e-02    7.6876779729584802e-02
 Variable bound violation:   0.0000000000000000e+00    0.0000000000000000e+00
-Complementarity.........:   3.3494978855025878e-03    3.3494978855025878e-03
-Overall NLP error.......:   9.7752410991815111e+02    1.1213380396548324e+05
+Complementarity.........:   3.6749739223904454e-02    3.6749739223904454e-02
+Overall NLP error.......:   1.6239416920839922e-01    1.4355868310872398e+02
 
 
-Number of objective function evaluations             = 319
-Number of objective gradient evaluations             = 120
+Number of objective function evaluations             = 291
+Number of objective gradient evaluations             = 107
 Number of equality constraint evaluations            = 0
-Number of inequality constraint evaluations          = 319
+Number of inequality constraint evaluations          = 291
 Number of equality constraint Jacobian evaluations   = 0
-Number of inequality constraint Jacobian evaluations = 120
+Number of inequality constraint Jacobian evaluations = 107
 Number of Lagrangian Hessian evaluations             = 0
-Total seconds in IPOPT                               = 60.042
+Total seconds in IPOPT                               = 60.184
 
 EXIT: Maximum wallclock time exceeded.

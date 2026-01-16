@@ -2,24 +2,13 @@ from ikflow.model_loading import get_ik_solver
 from ikflow.config import DEVICE
 import torch
 import numpy as np
-from time import time, sleep
-import sys
-import os
-from src.utils import RepoDir, BuildEnv, DrawAxes
+from src.utils import Mug
 from src.generic_program import ProgramOptions, IKFlowProgram
 import numpy as np
 from pydrake.all import (
-    StartMeshcat, 
-    RigidTransform,
-    Quaternion,
     MathematicalProgram,
     AutoDiffXd, 
-    Quaternion_, 
-    IpoptSolver,
-    SolverOptions,
-    CommonSolverOption,
-    MinimumDistanceLowerBoundConstraint,
-    SnoptSolver,
+    RigidTransform_,
 )
 
 
@@ -61,12 +50,13 @@ class PandaIKProgram(IKFlowProgram):
 
         self.prog.SetInitialGuess(self.c, target_pose)
         self.prog.SetInitialGuess(self.z, np.random.randn(self.ik_solver.network_width))
+        self.prog.SetInitialGuess(self.correction, np.zeros(7))
         self.jacobian_gen = torch.func.jacrev(self.ik_inference) ## function that can compute jacobian dq/dvars
 
         ## Add Constraints
         self.apply_constraints()
 
-        self.AddCosts()
+        self.add_costs()
 
 
     def apply_constraints(self):
@@ -80,7 +70,7 @@ class PandaIKProgram(IKFlowProgram):
         if self.options.joint_limits:
             self.JointLimitsConstraint()
 
-    def AddCosts(self):
+    def add_costs(self):
         if self.options.joint_centering_cost > 0:
             self.JointCenteringCost()
         if self.options.correction_cost_weight > 0: 
@@ -104,15 +94,6 @@ class PandaIKProgram(IKFlowProgram):
         q = output[:, :7].squeeze(0)
         return q + correction
     
-    def fk(self, q):
-        if isinstance(q[0], AutoDiffXd):
-            self.autodiff_plant.SetPositions(self.autodiff_context, q)
-            rigid_transform = self.autodiff_frame.CalcPoseInWorld(self.autodiff_context)
-
-        else:
-            self.plant.SetPositions(self.plant_context, q)
-            rigid_transform = self.frame.CalcPoseInWorld(self.plant_context)
-        return rigid_transform.translation(), rigid_transform.rotation().ToQuaternion().wxyz()
         
 
     def VarsToQ(self, vars):
@@ -146,7 +127,42 @@ class PandaIKProgram(IKFlowProgram):
             q_ad = np.array([AutoDiffXd(q_values[i], q_gradients[i]) for i in range(len(q_values))])
             
             return q_ad
+
+
+
+class PandaMugProgram(PandaIKProgram):
+    '''Program for grasping pose of a mug for Panda'''
+    def create_prog(self, target_mug = Mug(), q_nominal = np.zeros(9)):
+        self.prog = MathematicalProgram()
+        self.c = self.prog.NewContinuousVariables(7) # x y z qw qx qy qz into nn model
+        self.z = self.prog.NewContinuousVariables(self.ik_solver.network_width) # latent variables
+        self.correction = self.prog.NewContinuousVariables(7) ## small correction term to q
+
+        self.lumped_vars = np.hstack([self.c, self.z, self.correction])
+
+        self.target_mug = target_mug
+        self.q_nominal = q_nominal
+
+        self.prog.SetInitialGuess(self.c, [*target_mug.middle.translation(), 0, 0, 0, 0])
+        self.prog.SetInitialGuess(self.z, np.random.randn(self.ik_solver.network_width))
+        self.prog.SetInitialGuess(self.correction, np.zeros(7))
+        self.jacobian_gen = torch.func.jacrev(self.ik_inference) ##
+
+        self.apply_constraints()
+        self.add_costs()
     
-    def MugConstraint(self):
-        ### TODO: Maybe implement later
-        pass
+
+    def IKConstraint(self):
+        ### Rewritten Mug Constraint!!
+        self.prog.AddConstraint(
+            func=self.EvalMugConstraint,
+            lb=np.array([0, 0, -self.options.mug_height, 1]),
+            ub=np.array([0, 0, self.options.mug_height, 1]),
+            vars=self.lumped_vars
+        )
+    def EvalMugConstraint(self, vars):
+        xyz = self.fk(self.VarsToQ(vars))[:3]
+        mug_transform = np.linalg.inv(self.target_mug.middle.GetAsMatrix4())
+        return mug_transform @ np.array([[ *xyz, 1]]).T
+
+    
