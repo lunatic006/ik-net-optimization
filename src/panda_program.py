@@ -26,6 +26,7 @@ class PandaIKProgram(IKFlowProgram):
 
         self.frame = self.plant.GetBodyByName("panda_hand").body_frame()
         self.autodiff_frame = self.autodiff_plant.GetBodyByName("panda_hand").body_frame()
+        self.num_pos = self.plant.num_positions()
 
         model_name = "panda__full__lp191_5.25m"
         self.ik_solver, _ = get_ik_solver(model_name)
@@ -35,7 +36,7 @@ class PandaIKProgram(IKFlowProgram):
 
 
 
-    def create_prog(self, target_pose = np.zeros(7), q_nominal = np.zeros(9)):
+    def create_prog(self, target_pose = np.zeros(7), q_nominal = None):
         self.prog = MathematicalProgram()
         self.c = self.prog.NewContinuousVariables(7) # x y z qw qx qy qz into nn model
         self.z = self.prog.NewContinuousVariables(self.ik_solver.network_width) # latent variables
@@ -46,7 +47,10 @@ class PandaIKProgram(IKFlowProgram):
         ## TODO: Change the initial guess to something smarter
 
         self.target_pose = target_pose
-        self.q_nominal = q_nominal
+        if q_nominal is None:
+            self.q_nominal = np.zeros(self.num_pos)
+        else:
+            self.q_nominal = q_nominal
 
         self.prog.SetInitialGuess(self.c, target_pose)
         self.prog.SetInitialGuess(self.z, np.random.randn(self.ik_solver.network_width))
@@ -100,8 +104,8 @@ class PandaIKProgram(IKFlowProgram):
         ad = isinstance(vars[0], AutoDiffXd) ## The hard part is to make torch interact with AutoDiffXd necessary for drake.
 
         if not ad:
-            q = np.zeros(9)
-            q[7:] = [0.04, 0.04]  # fixed gripper joints
+            q = np.zeros(self.num_pos)
+            q[7:] = [0.04] * (self.num_pos - 7)  # fixed gripper joints
             q[:7] = self.ik_inference(vars).detach().cpu().numpy()
             return q
         
@@ -111,8 +115,8 @@ class PandaIKProgram(IKFlowProgram):
             vars_gradients = np.array([v.derivatives() for v in vars])
             
             # Compute q values
-            q_values = np.zeros(9)
-            q_values[7:] = [0.04, 0.04]
+            q_values = np.zeros(self.num_pos)
+            q_values[7:] = [0.04] * (self.num_pos - 7)
             q_values[:7] = self.ik_inference(vars_values).detach().cpu().numpy()
             
             # Compute Jacobian dq/dvars
@@ -122,7 +126,7 @@ class PandaIKProgram(IKFlowProgram):
             
             # Chain rule: dq/dvars @ dvars = dq
             # For each element of q, compute gradient via chain rule
-            q_gradients = np.zeros((9, len(vars)))
+            q_gradients = np.zeros((self.num_pos, len(vars)))
             q_gradients[:7, :] = jacobian_np @ vars_gradients
             
             # Create AutoDiffXd objects with value and gradient
@@ -134,7 +138,13 @@ class PandaIKProgram(IKFlowProgram):
 
 class PandaMugProgram(PandaIKProgram):
     '''Program for grasping pose of a mug for Panda'''
-    def create_prog(self, target_mug = Mug(), q_nominal = np.zeros(9)):
+    def __init__(self, diagram, options = ProgramOptions()):
+        super().__init__(diagram, options)
+        self.frame = self.frame = self.plant.GetFrameByName("between_fingers")
+        self.autodiff_frame = self.autodiff_plant.GetFrameByName("between_fingers")
+
+
+    def create_prog(self, target_mug = Mug(), q_nominal = None):
         self.prog = MathematicalProgram()
         self.c = self.prog.NewContinuousVariables(7) # x y z qw qx qy qz into nn model
         self.z = self.prog.NewContinuousVariables(self.ik_solver.network_width) # latent variables
@@ -143,7 +153,10 @@ class PandaMugProgram(PandaIKProgram):
         self.lumped_vars = np.hstack([self.c, self.z, self.correction])
 
         self.target_mug = target_mug
-        self.q_nominal = q_nominal
+        if q_nominal is None:
+            self.q_nominal = np.zeros(self.num_pos)
+        else:
+            self.q_nominal = q_nominal
 
         self.prog.SetInitialGuess(self.c, [*target_mug.middle.translation(), 0, 0, 0, 0])
         self.prog.SetInitialGuess(self.z, np.random.randn(self.ik_solver.network_width))
@@ -156,11 +169,11 @@ class PandaMugProgram(PandaIKProgram):
     
 
     def IKConstraint(self):
-        ### Rewritten Mug Constraint!!
+        ik_tol, _ = self.options.ik_constraint_tol
         self.prog.AddConstraint(
             func=self.EvalMugConstraint,
-            lb=np.array([0, 0, -self.target_mug.height, 1]),
-            ub=np.array([0, 0, self.target_mug.height, 1]),
+            lb=np.array([-ik_tol, -ik_tol, -self.target_mug.height, 1]),
+            ub=np.array([ik_tol, ik_tol, self.target_mug.height, 1]),
             vars=self.lumped_vars
         )
     def EvalMugConstraint(self, vars):

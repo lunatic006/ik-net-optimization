@@ -61,15 +61,9 @@ class IKFlowProgram:
         self.options = options
 
     def fk(self, q):
-        if isinstance(q[0], AutoDiffXd):
-            self.autodiff_plant.SetPositions(self.autodiff_context, q)
-            rigid_transform = self.autodiff_frame.CalcPoseInWorld(self.autodiff_context)
-
-        else:
-            self.plant.SetPositions(self.plant_context, q)
-            rigid_transform = self.frame.CalcPoseInWorld(self.plant_context)
+        frame, context = self.SetPositions(q)
+        rigid_transform = frame.CalcPoseInWorld(context)
         return rigid_transform.translation(), rigid_transform.rotation().ToQuaternion().wxyz()
-
 
     ## These are Robot Specific need to be implemented in each file ##
     def ik_inference(self, vars):
@@ -181,6 +175,14 @@ class IKFlowProgram:
             vars=self.correction
         )
         self.correction_cost.evaluator().set_description("CorrectionCost")
+
+    def SetPositions(self, q):
+        if isinstance(q[0], AutoDiffXd):
+            self.autodiff_plant.SetPositions(self.autodiff_context, q)
+            return self.autodiff_frame, self.autodiff_context
+        else:
+            self.plant.SetPositions(self.plant_context, q)
+            return self.frame, self.plant_context
     
 
     def Solve(self):

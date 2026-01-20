@@ -43,76 +43,6 @@ def BuildEnv(meshcat, directives_file=None):
     return diagram
 
 
-def BuildEnvWithDynamicMugs(meshcat, mug_positions, directives_file=None):
-    """
-    Build environment with dynamically added collision geometry for mugs.
-
-    Args:
-        meshcat: Meshcat visualizer instance
-        mug_positions: Array of shape (n, 2, 3) containing start and end positions for each mug
-        directives_file: Path to the directives file for the base environment
-
-    Returns:
-        diagram: The built diagram with collision geometry for all mugs
-    """
-    if directives_file is None:
-        directives_file = os.path.join(RepoDir(), 'models/iiwa_collision.yaml')
-
-    builder = DiagramBuilder()
-    plant, scene_graph = AddMultibodyPlantSceneGraph(builder, time_step=0.01)
-
-    # Load the base environment
-    parser = Parser(plant, scene_graph)
-    package_xml_path = os.path.join(RepoDir(), "package.xml")
-    parser.package_map().AddPackageXml(package_xml_path)
-    ProcessModelDirectives(LoadModelDirectives(directives_file), plant, parser)
-
-    # Add collision geometry for each dynamic mug
-    mug_model_path = os.path.join(RepoDir(), "models/mug/mug_simple_red.urdf")
-
-    for i, mug in enumerate(mug_positions):
-        start_pos = mug[0]
-        end_pos = mug[1]
-
-        # Add mug at start position
-        start_mug_name = f"dynamic_mug_start_{i}"
-        start_instance = parser.AddModelFromFile(mug_model_path, start_mug_name)
-
-        # Weld the start mug to world at the specified position
-        start_frame = plant.GetFrameByName("mug_body_link", start_instance)
-        plant.WeldFrames(
-            plant.world_frame(),
-            start_frame,
-            RigidTransform(RotationMatrix(), start_pos)
-        )
-
-        # Add mug at end position
-        end_mug_name = f"dynamic_mug_end_{i}"
-        end_instance = parser.AddModelFromFile(mug_model_path, end_mug_name)
-
-        # Weld the end mug to world at the specified position
-        end_frame = plant.GetFrameByName("mug_body_link", end_instance)
-        plant.WeldFrames(
-            plant.world_frame(),
-            end_frame,
-            RigidTransform(RotationMatrix(), end_pos)
-        )
-
-    # Finalize the plant
-    plant.Finalize()
-
-    # Apply visualization configuration
-    vis_config = VisualizationConfig()
-    vis_config.publish_illustration = True
-    vis_config.publish_proximity = True
-    vis_config.publish_inertia = True
-    vis_config.delete_on_initialization_event = True
-    ApplyVisualizationConfig(vis_config, builder, meshcat=meshcat)
-
-    diagram = builder.Build()
-    return diagram
-
-
 def DrawSphere(target, meshcat, name="/sphere", radius = 0.03, sphere_color = Rgba(1.0, 0.2, 0.2, 0.7)):
     sphere_position = target.translation()
     sphere_radius = radius
@@ -212,6 +142,6 @@ def extract_xyzrpy(pose):
 
 
 class Mug:
-    def __init__(self, middle: RigidTransform = RigidTransform(), height: float = 0.3):
+    def __init__(self, middle: RigidTransform = RigidTransform(), height: float = 0.04):
         self.middle = middle
         self.height = height
