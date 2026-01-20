@@ -24,8 +24,8 @@ class PandaIKProgram(IKFlowProgram):
         self.autodiff_context = self.autodiff_plant.CreateDefaultContext()
         self.diagram.ForcedPublish(self.diagram_context) 
 
-        self.frame = self.plant.GetBodyByName("panda_link8").body_frame()
-        self.autodiff_frame = self.autodiff_plant.GetBodyByName("panda_link8").body_frame()
+        self.frame = self.plant.GetBodyByName("panda_hand").body_frame()
+        self.autodiff_frame = self.autodiff_plant.GetBodyByName("panda_hand").body_frame()
 
         model_name = "panda__full__lp191_5.25m"
         self.ik_solver, _ = get_ik_solver(model_name)
@@ -101,6 +101,7 @@ class PandaIKProgram(IKFlowProgram):
 
         if not ad:
             q = np.zeros(9)
+            q[7:] = [0.04, 0.04]  # fixed gripper joints
             q[:7] = self.ik_inference(vars).detach().cpu().numpy()
             return q
         
@@ -111,6 +112,7 @@ class PandaIKProgram(IKFlowProgram):
             
             # Compute q values
             q_values = np.zeros(9)
+            q_values[7:] = [0.04, 0.04]
             q_values[:7] = self.ik_inference(vars_values).detach().cpu().numpy()
             
             # Compute Jacobian dq/dvars
@@ -148,6 +150,7 @@ class PandaMugProgram(PandaIKProgram):
         self.prog.SetInitialGuess(self.correction, np.zeros(7))
         self.jacobian_gen = torch.func.jacrev(self.ik_inference) ##
 
+        self.target_pose = np.array([*target_mug.middle.translation(), 1, 0, 0, 0]) ## for bounding box
         self.apply_constraints()
         self.add_costs()
     
@@ -156,13 +159,13 @@ class PandaMugProgram(PandaIKProgram):
         ### Rewritten Mug Constraint!!
         self.prog.AddConstraint(
             func=self.EvalMugConstraint,
-            lb=np.array([0, 0, -self.options.mug_height, 1]),
-            ub=np.array([0, 0, self.options.mug_height, 1]),
+            lb=np.array([0, 0, -self.target_mug.height, 1]),
+            ub=np.array([0, 0, self.target_mug.height, 1]),
             vars=self.lumped_vars
         )
     def EvalMugConstraint(self, vars):
-        xyz = self.fk(self.VarsToQ(vars))[:3]
+        position, _ = self.fk(self.VarsToQ(vars))
         mug_transform = np.linalg.inv(self.target_mug.middle.GetAsMatrix4())
-        return mug_transform @ np.array([[ *xyz, 1]]).T
+        return mug_transform @ np.array([[*position, 1]]).T
 
     

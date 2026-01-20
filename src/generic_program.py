@@ -157,8 +157,8 @@ class IKFlowProgram:
             self.z
         )
         self.bounding_box_constraint.evaluator().set_description("ZBoundingBoxConstraint")
-        c_lower_bound = self.target_pose - 0.1
-        c_upper_bound = self.target_pose + 0.1
+        c_lower_bound = self.target_pose - 5
+        c_upper_bound = self.target_pose + 5
         self.c_bounding_box_constraint = self.prog.AddBoundingBoxConstraint(
             c_lower_bound,
             c_upper_bound,
@@ -194,7 +194,6 @@ class IKFlowProgram:
         solver_options.SetOption(IpoptSolver().solver_id(), "print_user_options", "yes")
         solver_options.SetOption(CommonSolverOption.kPrintFileName, "ipopt_output.txt")
         solver_options.SetOption(IpoptSolver().solver_id(), "max_wall_time", 60.0)
-
         
         return solver.Solve(self.prog, solver_options=solver_options)
 
